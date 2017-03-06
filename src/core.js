@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 Array.prototype.isArray = true;
 if (typeof window.tastyPlugShutDown != 'undefined') window.tastyPlugShutDown();
 (function($){
@@ -48,7 +48,7 @@ if (typeof window.tastyPlugShutDown != 'undefined') window.tastyPlugShutDown();
             tastymojis: false,
             emojiset: "ios"
         };
-    
+
     function startup() {
         loadSettings();
         loadUI();
@@ -146,14 +146,14 @@ if (typeof window.tastyPlugShutDown != 'undefined') window.tastyPlugShutDown();
 
     function loadEvents() {
         API.on({
-            'chat':eventChat,
-            'userJoin':eventJoin,
-            'waitListUpdate':eventWLUpd,
-            'advance':eventDjAdv,
-            'chatCommand':eventCommand,
-            'voteUpdate':refreshMehs
+            API.CHAT:eventChat,
+            API.USER_JOIN:eventJoin,
+            API.WAIT_LIST_UPDATE:eventWLUpd,
+            API.ADVANCE:eventDjAdv,
+            API.CHAT_COMMAND:eventCommand,
+            API.VOTE_UPDATE:refreshMehs
         });
-        API.on('voteUpdate',eventVote);
+        API.on(API.VOTE_UPDATE,eventVote);
         $(window).resize(resize);
         $('#users-button:not(.selected)').click(refreshMehs);
         //make it draggable
@@ -186,7 +186,7 @@ if (typeof window.tastyPlugShutDown != 'undefined') window.tastyPlugShutDown();
                 $('#tooltip.tp-songtitle').remove();
             }
         );
-        
+
 
         //highlight ui buttons
         $('.tp-mainbutton,.tp-secbutton').hover(
