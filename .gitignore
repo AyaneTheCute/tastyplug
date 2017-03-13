@@ -8,3 +8,6 @@ secrets.sh
 
 # web-ext
 web-ext-artifacts
+/src/nbproject/
+/src/Build/
+/src/*.exe
