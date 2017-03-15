@@ -146,7 +146,7 @@ if (typeof window.tastyPlugShutDown != 'undefined')
 
         AddUIButton("autowoot", "Auto Woot!", settings.autowoot, undefined);
         AddUIButton("autojoin", "Auto Join", settings.autojoin);
-        AddUIButton("tp-hidevideo", "Hide Video", false);
+        AddUIButton("hidevideo", "Hide Video", false);
         AddUIButton("legacychat", "Legacy Chat", settings.legacychat);
         AddUIButton("boothalert", "Booth Alert", settings.boothalert);
         AddUIButton("histalert", "History Alert", settings.histalert);
