@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global API, _ */
+/* global API, _, SC, encodeURI, Node */
 
 Array.prototype.isArray = true;
 if (!String.prototype.format) {
@@ -144,27 +144,27 @@ if (typeof window.tastyPlugShutDown != 'undefined')
     function loadUI() {
         $('head').append('<link rel="stylesheet" href="<%= tastyplug_base_url %>/tastyplug.css">');
 
-        AddUIButton("autowoot", "Auto Woot!", true);
-        AddUIButton("autojoin", "Auto Join", true);
+        AddUIButton("autowoot", "Auto Woot!", settings.autowoot, undefined);
+        AddUIButton("autojoin", "Auto Join", settings.autojoin);
         AddUIButton("tp-hidevideo", "Hide Video", false);
-        AddUIButton("legacychat", "Legacy Chat", true);
-        AddUIButton("boothalert", "Booth Alert", true);
-        AddUIButton("histalert", "History Alert", true);
-        AddUIButton("mehtrack", "Meh Tracker", true);
-        AddUIButton("chatimgs", "Chat Images", true);
-        AddUIButton("emotes", "Cust. Emotes", true);
-        AddUIButton("emojis", "Tastymojis", true, undefined, true);
+        AddUIButton("legacychat", "Legacy Chat", settings.legacychat);
+        AddUIButton("boothalert", "Booth Alert", settings.boothalert);
+        AddUIButton("histalert", "History Alert", settings.histalert);
+        AddUIButton("mehtrack", "Meh Tracker", settings.mehtrack);
+        AddUIButton("chatimgs", "Chat Images", settings.chatimgs);
+        AddUIButton("emotes", "Cust. Emotes", settings.emotes);
+        AddUIButton("emojis", "Tastymojis", settings.tastymojis, undefined, true);
         AddUIButton("emojiios", "iOS", false, "secmojis");
         AddUIButton("emojitwitter", "Twitter", false, "secmojis");
         AddUIButton("emojiemojione", "Emojione", false, "secmojis");
-        AddUIButton("mentions", "Chat Mentions", true, undefined, true);
+        AddUIButton("mentions", "Chat Mentions", settings.chatmentions, undefined, true);
         AddUIButton("addmention", "Add", false, "secmention");
         AddUIButton("delmention", "Delete", false, "secmention");
         AddUIButton("listmention", "List", false, "secmention");
-        AddUIButton("joinnotifs", "Join Notifs.", true, undefined, true);
-        AddUIButton("joinranks", "Ranks", false, "secjoin tp-toggle");
-        AddUIButton("joinfriends", "Friends", false, "secjoin tp-toggle");
-        AddUIButton("joinlvl1", "Level 1s", false, "secjoin tp-toggle");
+        AddUIButton("joinnotifs", "Join Notifs.", settings.joinnotifs.toggle, undefined, true);
+        AddUIButton("joinranks", "Ranks", settings.joinnotifs.ranks, "secjoin tp-toggle");
+        AddUIButton("joinfriends", "Friends", settings.joinnotifs.friends, "secjoin tp-toggle");
+        AddUIButton("joinlvl1", "Level 1s", settings.joinnotifs.lvl1, "secjoin tp-toggle");
 
         tastyplugUIMid += '\
         	<a href=https://emotes.tastycat.org target=_blank>\
@@ -177,35 +177,7 @@ if (typeof window.tastyPlugShutDown != 'undefined')
         if (room == '/hummingbird-me')
             $('#tp-autojoin').remove();
 
-        if (!settings.autowoot)
-            $('#tp-autowoot').removeClass('button-on');
-        if (!settings.autojoin)
-            $('#tp-autojoin').removeClass('button-on');
-        if (!settings.boothalert)
-            $('#tp-boothalert').removeClass('button-on');
-        if (!settings.legacychat)
-            $('#tp-legacychat').removeClass('button-on');
-        if (!settings.histalert)
-            $('#tp-histalert').removeClass('button-on');
-        if (!settings.mehtrack)
-            $('#tp-mehtrack').removeClass('button-on');
-        if (!settings.chatimgs)
-            $('#tp-chatimgs').removeClass('button-on');
-        if (!settings.emotes)
-            $('#tp-emotes').removeClass('button-on');
-        if (!settings.tastymojis)
-            $('#tp-emojis').removeClass('button-on');
         $('#tp-emoji' + settings.emojiset).addClass('button-on');
-        if (!settings.chatmentions)
-            $('#tp-mentions').removeClass('button-on');
-        if (!settings.joinnotifs.toggle)
-            $('#tp-joinnotifs').removeClass('button-on');
-        if (!settings.joinnotifs.ranks)
-            $('#tp-joinranks').removeClass('button-on');
-        if (!settings.joinnotifs.friends)
-            $('#tp-joinfriends').removeClass('button-on');
-        if (!settings.joinnotifs.lvl1)
-            $('#tp-joinlvl1').removeClass('button-on');
         if (!settings.show) {
             $('.tp-mainbutton').hide();
             $('#tastyplug-ui').css('padding-bottom', '0');
@@ -245,7 +217,7 @@ if (typeof window.tastyPlugShutDown != 'undefined')
             containment: '#tp-room',
             scroll: false,
             start: function () {
-                drag = true
+                drag = true;
             },
             stop: function (e, ui) {
                 drag = false;
@@ -276,10 +248,10 @@ if (typeof window.tastyPlugShutDown != 'undefined')
         //highlight ui buttons
         $('.tp-mainbutton,.tp-secbutton').hover(
             function () {
-                $(this).addClass('tp-highlight')
+                $(this).addClass('tp-highlight');
             },
             function () {
-                $(this).removeClass('tp-highlight')
+                $(this).removeClass('tp-highlight');
             }
         );
         //tp title
@@ -302,6 +274,17 @@ if (typeof window.tastyPlugShutDown != 'undefined')
                 saveSettings();
             }
         });
+
+        function CreateNewButtonFunction(buttonId, buttonSetting, functionAction) {
+            $('#' + buttonId).click(function () {
+                if (typeof buttonSetting !== "undefined")
+                    settings[buttonSetting] = !settings[buttonSetting];
+                $(this).toggleClass('button-on');
+                saveSettings();
+                functionAction();
+            });
+        }
+
         //tp autowoot
         $('#tp-autowoot').click(function () {
             settings.autowoot = !settings.autowoot;
@@ -1035,10 +1018,10 @@ if (typeof window.tastyPlugShutDown != 'undefined')
             b.parent().append('<div class="tastyplug-img-delete" style="display:none">X</div>');
             b.parent().parent().hover(
                 function () {
-                    $(this).find('.tastyplug-img-delete').css('display', 'block')
+                    $(this).find('.tastyplug-img-delete').css('display', 'block');
                 },
                 function () {
-                    $(this).find('.tastyplug-img-delete').css('display', 'none')
+                    $(this).find('.tastyplug-img-delete').css('display', 'none');
                 }
             );
             b.parent().find('.tastyplug-img-delete').click(function () {
@@ -1063,10 +1046,10 @@ if (typeof window.tastyPlugShutDown != 'undefined')
         b.parent().append('<div class="tastyplug-img-delete" style="display:none">X</div>');
         b.parent().parent().hover(
             function () {
-                $(this).find('.tastyplug-img-delete').css('display', 'block')
+                $(this).find('.tastyplug-img-delete').css('display', 'block');
             },
             function () {
-                $(this).find('.tastyplug-img-delete').css('display', 'block')
+                $(this).find('.tastyplug-img-delete').css('display', 'block');
             }
         );
         b.parent().find('.tastyplug-img-delete').click(function () {
@@ -1111,18 +1094,18 @@ if (typeof window.tastyPlugShutDown != 'undefined')
             API.djJoin();
             joincd = true;
             setTimeout(function () {
-                joincd = false
+                joincd = false;
             }, 5000);
         }
     }
     function saveSettings() {
-        localStorage.setItem('tastyPlugSettings', JSON.stringify(settings))
+        localStorage.setItem('tastyPlugSettings', JSON.stringify(settings));
     }
     function getLocked() {
-        return $('.lock-toggle .icon').hasClass('icon-locked')
+        return $('.lock-toggle .icon').hasClass('icon-locked');
     }
     function woot() {
-        $('#woot').click()
+        $('#woot').click();
     }
 
     var tastyMojis = (function () {
@@ -1138,7 +1121,7 @@ if (typeof window.tastyPlugShutDown != 'undefined')
                 if (settings.tastymojis)
                     $("#tastymojis-css").text(sizeCSS + (settings.emojiset != "ios" ? "span.emoji-inner{background:url('https://tastyplug.tastycat.org/images/" + settings.emojiset + ".png')" : ""));
             }
-        }
+        };
         return {toggle: toggle};
     })();
 
@@ -1182,7 +1165,7 @@ if (typeof window.tastyPlugShutDown != 'undefined')
                 icon = $('<i class="icon icon-tp-pm legacy-fake-icon"></i>');
                 icon.insertAfter(badge);
             } else if (message.children("div.admin")[0]) {
-                icon = $('<i class="icon icon-chat-admin legacy-fake-icon"></i>')
+                icon = $('<i class="icon icon-chat-admin legacy-fake-icon"></i>');
                 icon.insertAfter(badge);
             }
             messageText.insertAfter(messageUser);
